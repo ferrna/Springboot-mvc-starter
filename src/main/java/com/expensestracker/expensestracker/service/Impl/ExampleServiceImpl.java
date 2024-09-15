@@ -5,9 +5,11 @@ import com.expensestracker.expensestracker.model.Example;
 import com.expensestracker.expensestracker.repository.Impl.ExampleRepositoryImpl;
 import com.expensestracker.expensestracker.service.ExampleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,32 +25,46 @@ public class ExampleServiceImpl implements ExampleService {
 
     @Override
     public Example getExampleById(Long id) {
-        if(exampleRepository.findById(id) == null){
+        Optional<Example> exampleById = exampleRepository.findById(id);
+        if(exampleById.isEmpty()) {
             throw new ExampleNotFoundException(id);
         }
-        return exampleRepository.findById(id);
+        return exampleById.get();
     }
 
     @Override
     public Example createExample(Example example) {
+        // build example dto, body and response
+        //InvalidExampleException
         return exampleRepository.save(example);
     }
 
     @Override
-    public Example updateExample(Long id, Example example) {
-        if(exampleRepository.findById(id) == null) {
+    public int updateExample(Long id, Example example) throws ExampleNotFoundException {
+        try {
+            int updatedCount = exampleRepository.update(id, example);
+            if (updatedCount == 0) {
+                throw new ExampleNotFoundException(id);
+            }
+            return updatedCount;
+
+        } catch (DataAccessException e) {
+            // Handle specific exception or rethrow as a custom exception
             throw new ExampleNotFoundException(id);
         }
-        exampleRepository.update(id, example);
-        return example;
     }
 
     @Override
-    public void deleteExample(Long id) {
-        if(exampleRepository.findById(id) == null) {
+    public void deleteExample(Long id) throws ExampleNotFoundException {
+        try {
+            int deletedCount = exampleRepository.delete(id);
+            if (deletedCount == 0) {
+                throw new ExampleNotFoundException(id);
+            }
+        } catch (DataAccessException e) {
+            // Handle specific exception or rethrow as a custom exception
             throw new ExampleNotFoundException(id);
         }
-        exampleRepository.delete(id);
     }
 
     @Override
@@ -58,4 +74,23 @@ public class ExampleServiceImpl implements ExampleService {
                 .filter(example -> example.getGenre().equalsIgnoreCase(genre))
                 .collect(Collectors.toList());
     }
+
 }
+
+
+//// DTO in Service Layer
+//public class UserDTO {
+//    private String username;
+//    private String email;
+//    // getters and setters
+//}
+
+//return convertToDTO(userEntity);
+//        }
+//
+//private UserDTO convertToDTO(UserEntity userEntity) {
+//        UserDTO dto = new UserDTO();
+//        dto.setUsername(userEntity.getUsername());
+//        dto.setEmail(userEntity.getEmail());
+//        return dto;
+//        }

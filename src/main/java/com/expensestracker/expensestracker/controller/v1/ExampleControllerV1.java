@@ -1,16 +1,22 @@
 package com.expensestracker.expensestracker.controller.v1;
 
+import com.expensestracker.expensestracker.exception.ExampleNotFoundException;
 import com.expensestracker.expensestracker.model.Example;
 import com.expensestracker.expensestracker.service.Impl.ExampleServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+// With RestController Spring understand that it has to return the response object serialized into JSON or XML format
+// RestController is a combination of Controller and ResponseBody, with Controller only Spring
+// expects the return value to be a view name, and it will attempt to resolve and render a corresponding view
 @RestController
 @RequestMapping("/api/v1/examples")
 public class ExampleControllerV1 {
@@ -18,49 +24,90 @@ public class ExampleControllerV1 {
     @Autowired
     ExampleServiceImpl exampleService;
 
-    @Operation(summary = "Devuelve un ejemplo de la bbdd", description = "Debe enviar el id del ejemplo a buscar.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = ""),
-            @ApiResponse(responseCode = "500", description = "")
-    })
     @GetMapping
-    public ResponseEntity<List<Example>> getAllExamples() {
+    @Operation(summary = "Returns all examples from db")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Examples returned"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<ResponseWrapper> getAllExamples() {
         List<Example> examples = exampleService.getAllExamples();
-        return ResponseEntity.ok(examples);
+        return ResponseEntity.ok(new ResponseWrapper(examples));
     }
 
-    @Operation(summary = "Devuelve un ejemplo de la bbdd", description = "Debe enviar el id del ejemplo a buscar.", tags = {"pets"})
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = ""),
-            @ApiResponse(responseCode = "500", description = "")
-    })
     @GetMapping("/{id}")
-    public ResponseEntity<Example> getExampleById(@PathVariable Long id) {
+    @Operation(summary = "Returns an example from db", description = "Must send ID of example to find", tags = {"Finds"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Example found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<ResponseWrapper> getExampleById(@Parameter(description = "ID of example") @PathVariable Long id) {
         Example example = exampleService.getExampleById(id);
-        return ResponseEntity.ok(example);
+        return ResponseEntity.ok(new ResponseWrapper(example));
     }
 
     @PostMapping
-    public ResponseEntity<Example> createExample(@RequestBody Example example){
+    @Operation(summary = "Creates register Example in db")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Example created"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<ResponseWrapper> createExample(@RequestBody Example example){
         Example createdExample = exampleService.createExample(example);
-        return ResponseEntity.ok(createdExample);
+        if(createdExample == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseWrapper("Could not create example"));
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseWrapper(createdExample));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Example> updateExample(@PathVariable Long id, @RequestBody Example example){
-        Example updatedExample = exampleService.updateExample(id, example);
-        return ResponseEntity.ok(updatedExample);
+    @Operation(summary = "Updates a register Example in db")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Example updated"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<ResponseWrapper> updateExample(@PathVariable Long id, @RequestBody Example example){
+        exampleService.updateExample(id, example);
+        return ResponseEntity.ok(new ResponseWrapper("Example updated"));
     }
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteExample(@PathVariable Long id) {
+    @Operation(summary = "Deletes a register Example in db")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Example deleted"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<ResponseWrapper> deleteExample(@PathVariable Long id) {
         exampleService.deleteExample(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(new ResponseWrapper("Example deleted"));
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<List<Example>> getAllExamplesByGenre(@RequestParam String genre) {
+    @Operation(summary = "Filters Example registers by Genre from db")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Examples returned"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<ResponseWrapper> getAllExamplesByGenre(@RequestParam String genre) {
         List<Example> examples = exampleService.getAllExamplesByGenre(genre);
-        return ResponseEntity.ok(examples);
+        return ResponseEntity.ok(new ResponseWrapper(examples));
+    }
+
+
+    // Handle ExampleNotFoundException
+    @ExceptionHandler(ExampleNotFoundException.class)
+    public ResponseEntity<ResponseWrapper> handleExampleNotFound(ExampleNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseWrapper(ex.getMessage()));
     }
 
 }
+
+//    return ResponseEntity.ok(example);
+//    return new ResponseEntity<>(HttpStatus.OK);
+//    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found: " + id);
+//    return ResponseEntity.noContent().build();
+//    return ResponseEntity.ok()
+//            .header("Custom-Header", "CustomHeaderValue")
+//                             .body(users);
+//    return ResponseEntity.ok("User found: " + id);

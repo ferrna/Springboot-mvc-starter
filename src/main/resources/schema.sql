@@ -1,6 +1,0 @@
-CREATE TABLE IF NOT EXISTS examples (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255),
-    genre VARCHAR(255),
-    price DOUBLE
-);

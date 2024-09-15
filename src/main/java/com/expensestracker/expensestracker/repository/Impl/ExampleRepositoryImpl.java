@@ -15,12 +15,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Repository
 public class ExampleRepositoryImpl implements ExampleRepository {
 
-    private final static String SELECT_ALL_EXAMPLES = "SELECT * FROM examples";
-    private final static String SELECT_EXAMPLE_BY_ID ="SELECT * FROM examples WHERE id = ?";
+    private final static String SELECT_ALL_EXAMPLES = "SELECT id, name, genre, price FROM examples";
+    private final static String SELECT_EXAMPLE_BY_ID ="SELECT id, name, genre, price FROM examples WHERE id = ?";
     private final static String INSERT_NEW_EXAMPLE = "INSERT INTO examples (name, genre, price) VALUES (?, ?, ?)";
     private final static String DELETE_EXAMPLE_BY_ID = "DELETE FROM examples WHERE id = ?";
     private final static String CREATE_TABLE_EXAMPLES = "CREATE TABLE IF NOT EXISTS examples(id INT PRIMARY KEY,\n" +
@@ -41,7 +42,7 @@ public class ExampleRepositoryImpl implements ExampleRepository {
 //        // 1°
 //    }
 
-    private RowMapper<Example> rowMapper = new RowMapper<Example>() {
+    private final RowMapper<Example> rowMapper = new RowMapper<Example>() {
         @Override
         public Example mapRow(ResultSet rs, int rowNum) throws SQLException {
             Example example = new Example();
@@ -59,8 +60,8 @@ public class ExampleRepositoryImpl implements ExampleRepository {
     }
 
     @Override
-    public Example findById(Long id) {
-        return jdbcTemplate.queryForObject(SELECT_EXAMPLE_BY_ID, new Object[]{id}, rowMapper);
+    public Optional<Example> findById(Long id) {
+        return Optional.ofNullable(jdbcTemplate.queryForObject(SELECT_EXAMPLE_BY_ID, new Object[]{id}, rowMapper));
     }
 
     @Override

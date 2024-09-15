@@ -1,1 +1,1 @@
-INSERT INTO examples (id, name, genre, price) VALUES (12L, 'Example Name', 'Genre', 22.10);
+INSERT INTO examples (name, genre, price) VALUES ('Example Name', 'Genre', 22.10);
