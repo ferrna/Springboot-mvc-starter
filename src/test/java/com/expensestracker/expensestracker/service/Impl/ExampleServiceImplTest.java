@@ -40,7 +40,7 @@ class ExampleServiceImplTest {
         when(exampleRepository.save(any(Example.class))).thenReturn(savedExample);
 
         // WHEN
-        Example result = exampleService.createExample(example);
+        ExampleDTO result = exampleService.createExample(example);
 
         // THEN
         assertEquals(1L, result.getId());

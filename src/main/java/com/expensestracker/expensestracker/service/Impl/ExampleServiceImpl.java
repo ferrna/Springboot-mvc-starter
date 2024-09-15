@@ -1,6 +1,8 @@
 package com.expensestracker.expensestracker.service.Impl;
 
+import com.expensestracker.expensestracker.exception.CustomDataAccessException;
 import com.expensestracker.expensestracker.exception.ExampleNotFoundException;
+import com.expensestracker.expensestracker.exception.InvalidExampleException;
 import com.expensestracker.expensestracker.model.Example;
 import com.expensestracker.expensestracker.repository.Impl.ExampleRepositoryImpl;
 import com.expensestracker.expensestracker.service.ExampleService;
@@ -33,10 +35,19 @@ public class ExampleServiceImpl implements ExampleService {
     }
 
     @Override
-    public Example createExample(Example example) {
-        // build example dto, body and response
-        //InvalidExampleException
-        return exampleRepository.save(example);
+    public ExampleDTO createExample(Example example) throws InvalidExampleException, CustomDataAccessException {
+        try {
+            // donde filtrar el Example a dto, directamente en el query o siempre en el service
+            // y que controller siempre reciba objectos dto
+            ExampleServiceImplUtils.validExampleProvided(example);
+            Example savedExample = exampleRepository.save(example);
+            return ExampleServiceImplUtils.convertEntityToDTO(savedExample);
+        } catch (InvalidExampleException e) {
+            throw new InvalidExampleException("Invalid Example provided " + e.getMessage());
+        } catch (DataAccessException e) {
+            // jdbcTemplate.update() exception
+            throw new CustomDataAccessException("Could not create register in database");
+        }
     }
 
     @Override
@@ -49,7 +60,6 @@ public class ExampleServiceImpl implements ExampleService {
             return updatedCount;
 
         } catch (DataAccessException e) {
-            // Handle specific exception or rethrow as a custom exception
             throw new ExampleNotFoundException(id);
         }
     }
@@ -76,21 +86,3 @@ public class ExampleServiceImpl implements ExampleService {
     }
 
 }
-
-
-//// DTO in Service Layer
-//public class UserDTO {
-//    private String username;
-//    private String email;
-//    // getters and setters
-//}
-
-//return convertToDTO(userEntity);
-//        }
-//
-//private UserDTO convertToDTO(UserEntity userEntity) {
-//        UserDTO dto = new UserDTO();
-//        dto.setUsername(userEntity.getUsername());
-//        dto.setEmail(userEntity.getEmail());
-//        return dto;
-//        }

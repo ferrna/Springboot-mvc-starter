@@ -2,6 +2,7 @@ package com.expensestracker.expensestracker.controller.v1;
 
 import com.expensestracker.expensestracker.exception.ExampleNotFoundException;
 import com.expensestracker.expensestracker.model.Example;
+import com.expensestracker.expensestracker.service.Impl.ExampleDTO;
 import com.expensestracker.expensestracker.service.Impl.ExampleServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -53,7 +54,7 @@ public class ExampleControllerV1 {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<ResponseWrapper> createExample(@RequestBody Example example){
-        Example createdExample = exampleService.createExample(example);
+        ExampleDTO createdExample = exampleService.createExample(example);
         if(createdExample == null) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseWrapper("Could not create example"));
         }
