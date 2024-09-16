@@ -2,7 +2,6 @@ package com.expensestracker.expensestracker.repository.Impl;
 
 import com.expensestracker.expensestracker.model.Example;
 import com.expensestracker.expensestracker.repository.ExampleRepository;
-import com.expensestracker.expensestracker.repository.Impl.Utils.QueryResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -86,7 +85,7 @@ public class ExampleRepositoryImpl implements ExampleRepository {
             return 0;
         }
         return jdbcTemplate
-                .update(queryResult.getQuery(), queryResult.getParams());
+                .update(queryResult.query(), queryResult.params());
     }
 
     @Override

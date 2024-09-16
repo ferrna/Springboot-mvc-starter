@@ -43,7 +43,7 @@ public class ExampleControllerV1 {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<ResponseWrapper> getExampleById(@Parameter(description = "ID of example") @PathVariable Long id) {
-        Example example = exampleService.getExampleById(id);
+        ExampleDTO example = exampleService.getExampleById(id);
         return ResponseEntity.ok(new ResponseWrapper(example));
     }
 
@@ -55,9 +55,6 @@ public class ExampleControllerV1 {
     })
     public ResponseEntity<ResponseWrapper> createExample(@RequestBody Example example){
         ExampleDTO createdExample = exampleService.createExample(example);
-        if(createdExample == null) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseWrapper("Could not create example"));
-        }
         return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseWrapper(createdExample));
     }
 
@@ -73,7 +70,7 @@ public class ExampleControllerV1 {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Deletes a register Example in db")
+    @Operation(summary = "Deletes a register Example from db")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Example deleted"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -84,7 +81,7 @@ public class ExampleControllerV1 {
     }
 
     @GetMapping("/filter")
-    @Operation(summary = "Filters Example registers by Genre from db")
+    @Operation(summary = "Filters Example registers by Genre from db" , description = "Must send Genre String", tags = {"Finds"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Examples returned"),
             @ApiResponse(responseCode = "500", description = "Internal server error")

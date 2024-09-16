@@ -14,6 +14,14 @@ public class ExampleServiceImplUtils {
         return dto;
     }
 
+    private Example convertToEntity(ExampleDTO exampleDTO) {
+        Example example = new Example();
+        example.setName(exampleDTO.getName());
+        example.setGenre(exampleDTO.getGenre());
+        example.setPrice(exampleDTO.getPrice());
+        return example;
+    }
+
     public static void validExampleProvided(Example example) throws InvalidExampleException {
         if (example.getName().length() < 3 || example.getName().length() > 60 ){
             throw new InvalidExampleException("Name must be between 3 and 60 characters long");

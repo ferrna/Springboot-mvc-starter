@@ -1,7 +1,6 @@
 package com.expensestracker.expensestracker.repository.Impl;
 
 import com.expensestracker.expensestracker.model.Example;
-import com.expensestracker.expensestracker.repository.Impl.Utils.QueryResult;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

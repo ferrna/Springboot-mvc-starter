@@ -26,24 +26,22 @@ public class ExampleServiceImpl implements ExampleService {
     }
 
     @Override
-    public Example getExampleById(Long id) {
+    public ExampleDTO getExampleById(Long id) {
         Optional<Example> exampleById = exampleRepository.findById(id);
         if(exampleById.isEmpty()) {
             throw new ExampleNotFoundException(id);
         }
-        return exampleById.get();
+        return ExampleServiceImplUtils.convertEntityToDTO(exampleById.get());
     }
 
     @Override
     public ExampleDTO createExample(Example example) throws InvalidExampleException, CustomDataAccessException {
         try {
-            // donde filtrar el Example a dto, directamente en el query o siempre en el service
-            // y que controller siempre reciba objectos dto
             ExampleServiceImplUtils.validExampleProvided(example);
             Example savedExample = exampleRepository.save(example);
             return ExampleServiceImplUtils.convertEntityToDTO(savedExample);
         } catch (InvalidExampleException e) {
-            throw new InvalidExampleException("Invalid Example provided " + e.getMessage());
+            throw new InvalidExampleException("Invalid Example provided: " + e.getMessage());
         } catch (DataAccessException e) {
             // jdbcTemplate.update() exception
             throw new CustomDataAccessException("Could not create register in database");
@@ -53,6 +51,7 @@ public class ExampleServiceImpl implements ExampleService {
     @Override
     public int updateExample(Long id, Example example) throws ExampleNotFoundException {
         try {
+            // validate Example, convert to DTO, or validate in Repository
             int updatedCount = exampleRepository.update(id, example);
             if (updatedCount == 0) {
                 throw new ExampleNotFoundException(id);
@@ -73,7 +72,9 @@ public class ExampleServiceImpl implements ExampleService {
             }
         } catch (DataAccessException e) {
             // Handle specific exception or rethrow as a custom exception
-            throw new ExampleNotFoundException(id);
+            throw new CustomDataAccessException(
+                    "Could not delete register from database, "
+                            + e.getMessage() + ", id: " + id);
         }
     }
 

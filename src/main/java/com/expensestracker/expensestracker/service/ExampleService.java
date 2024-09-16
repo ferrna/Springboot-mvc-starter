@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface ExampleService {
     List<Example> getAllExamples();
-    Example getExampleById(@PathVariable Long id);
+    ExampleDTO getExampleById(@PathVariable Long id);
     ExampleDTO createExample(@RequestBody Example example);
     int updateExample(@PathVariable Long id, @RequestBody Example example);
     void deleteExample(@PathVariable Long id);

@@ -11,7 +11,7 @@ public class ResponseWrapper {
     private Example example;
     private List<Example> examples;
     private String message;
-    private ExampleDTO createdExample;
+    private ExampleDTO exampleData;
 
     public ResponseWrapper(Example example) {
         this.example = example;
@@ -25,8 +25,8 @@ public class ResponseWrapper {
         this.message = message;
     }
 
-    public ResponseWrapper(ExampleDTO createdExample) {
-        this.createdExample = createdExample;
+    public ResponseWrapper(ExampleDTO exampleData) {
+        this.exampleData = exampleData;
     }
 
     public Example getExample() {
@@ -41,8 +41,8 @@ public class ResponseWrapper {
         return message;
     }
 
-    public ExampleDTO getCreatedExample() {
-        return createdExample;
+    public ExampleDTO getExampleData() {
+        return exampleData;
     }
 
 }

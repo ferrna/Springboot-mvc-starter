@@ -9,9 +9,24 @@ import org.springframework.dao.DataAccessException;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+//  @ExceptionHandler for a specific superclass will handle all exceptions that are
+//  instances of that superclass, which includes any subclass.
+//  When you define separate @ExceptionHandler methods for specific exceptions, Spring
+//  will use the more specific handler if the exception matches exactly.
+
     @ExceptionHandler(ExampleNotFoundException.class)
     public ResponseEntity<String> handleExampleNotFound(ExampleNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidExampleException.class)
+    public ResponseEntity<String> handleInvalidExampleException(InvalidExampleException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(CustomDataAccessException.class)
+    public ResponseEntity<String> handleCustomDataAccessException(CustomDataAccessException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
     }
 
     @ExceptionHandler(DataAccessException.class)
