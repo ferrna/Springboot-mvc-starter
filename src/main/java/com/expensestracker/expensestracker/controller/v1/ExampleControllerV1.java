@@ -1,9 +1,10 @@
 package com.expensestracker.expensestracker.controller.v1;
 
+import com.expensestracker.expensestracker.dto.ExampleResponseWrapper;
 import com.expensestracker.expensestracker.exception.ExampleNotFoundException;
 import com.expensestracker.expensestracker.model.Example;
-import com.expensestracker.expensestracker.service.Impl.ExampleDTO;
-import com.expensestracker.expensestracker.service.Impl.ExampleServiceImpl;
+import com.expensestracker.expensestracker.service.ExampleService;
+import com.expensestracker.expensestracker.dto.ExampleDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -22,8 +23,12 @@ import java.util.List;
 @RequestMapping("/api/v1/examples")
 public class ExampleControllerV1 {
 
+    private final ExampleService exampleService;
+
     @Autowired
-    ExampleServiceImpl exampleService;
+    public ExampleControllerV1(ExampleService exampleService) {
+        this.exampleService = exampleService;
+    }
 
     @GetMapping
     @Operation(summary = "Returns all examples from db")
@@ -31,9 +36,9 @@ public class ExampleControllerV1 {
             @ApiResponse(responseCode = "200", description = "Examples returned"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<ResponseWrapper> getAllExamples() {
+    public ResponseEntity<ExampleResponseWrapper> getAllExamples() {
         List<Example> examples = exampleService.getAllExamples();
-        return ResponseEntity.ok(new ResponseWrapper(examples));
+        return ResponseEntity.ok(new ExampleResponseWrapper(examples));
     }
 
     @GetMapping("/{id}")
@@ -42,9 +47,9 @@ public class ExampleControllerV1 {
             @ApiResponse(responseCode = "200", description = "Example found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<ResponseWrapper> getExampleById(@Parameter(description = "ID of example") @PathVariable Long id) {
+    public ResponseEntity<ExampleResponseWrapper> getExampleById(@Parameter(description = "ID of example") @PathVariable Long id) {
         ExampleDTO example = exampleService.getExampleById(id);
-        return ResponseEntity.ok(new ResponseWrapper(example));
+        return ResponseEntity.ok(new ExampleResponseWrapper(example));
     }
 
     @PostMapping
@@ -53,9 +58,9 @@ public class ExampleControllerV1 {
             @ApiResponse(responseCode = "201", description = "Example created"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<ResponseWrapper> createExample(@RequestBody Example example){
+    public ResponseEntity<ExampleResponseWrapper> createExample(@RequestBody Example example){
         ExampleDTO createdExample = exampleService.createExample(example);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseWrapper(createdExample));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ExampleResponseWrapper(createdExample));
     }
 
     @PatchMapping("/{id}")
@@ -64,9 +69,9 @@ public class ExampleControllerV1 {
             @ApiResponse(responseCode = "200", description = "Example updated"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<ResponseWrapper> updateExample(@PathVariable Long id, @RequestBody Example example){
+    public ResponseEntity<ExampleResponseWrapper> updateExample(@PathVariable Long id, @RequestBody Example example){
         exampleService.updateExample(id, example);
-        return ResponseEntity.ok(new ResponseWrapper("Example updated"));
+        return ResponseEntity.ok(new ExampleResponseWrapper("Example updated"));
     }
 
     @DeleteMapping("/{id}")
@@ -75,9 +80,9 @@ public class ExampleControllerV1 {
             @ApiResponse(responseCode = "200", description = "Example deleted"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<ResponseWrapper> deleteExample(@PathVariable Long id) {
+    public ResponseEntity<ExampleResponseWrapper> deleteExample(@PathVariable Long id) {
         exampleService.deleteExample(id);
-        return ResponseEntity.ok(new ResponseWrapper("Example deleted"));
+        return ResponseEntity.ok(new ExampleResponseWrapper("Example deleted"));
     }
 
     @GetMapping("/filter")
@@ -86,16 +91,16 @@ public class ExampleControllerV1 {
             @ApiResponse(responseCode = "200", description = "Examples returned"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<ResponseWrapper> getAllExamplesByGenre(@RequestParam String genre) {
+    public ResponseEntity<ExampleResponseWrapper> getAllExamplesByGenre(@RequestParam String genre) {
         List<Example> examples = exampleService.getAllExamplesByGenre(genre);
-        return ResponseEntity.ok(new ResponseWrapper(examples));
+        return ResponseEntity.ok(new ExampleResponseWrapper(examples));
     }
 
 
     // Handle ExampleNotFoundException
     @ExceptionHandler(ExampleNotFoundException.class)
-    public ResponseEntity<ResponseWrapper> handleExampleNotFound(ExampleNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseWrapper(ex.getMessage()));
+    public ResponseEntity<ExampleResponseWrapper> handleExampleNotFound(ExampleNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExampleResponseWrapper(ex.getMessage()));
     }
 
 }

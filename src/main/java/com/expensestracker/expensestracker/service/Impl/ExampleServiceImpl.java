@@ -1,24 +1,35 @@
 package com.expensestracker.expensestracker.service.Impl;
 
+import com.expensestracker.expensestracker.dto.ExampleDTO;
 import com.expensestracker.expensestracker.exception.CustomDataAccessException;
 import com.expensestracker.expensestracker.exception.ExampleNotFoundException;
 import com.expensestracker.expensestracker.exception.InvalidExampleException;
 import com.expensestracker.expensestracker.model.Example;
-import com.expensestracker.expensestracker.repository.Impl.ExampleRepositoryImpl;
+import com.expensestracker.expensestracker.repository.ExampleRepository;
 import com.expensestracker.expensestracker.service.ExampleService;
+import com.expensestracker.expensestracker.service.ExampleValidationService;
+import com.expensestracker.expensestracker.service.utils.ExampleServiceImplUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class ExampleServiceImpl implements ExampleService {
 
+    private final ExampleRepository exampleRepository;
+    private final Map<String, ExampleValidationService> validationServiceMap;
+
     @Autowired
-    ExampleRepositoryImpl exampleRepository;
+    public ExampleServiceImpl(ExampleRepository exampleRepository,
+                              Map<String, ExampleValidationService> validationServiceMap) {
+        this.exampleRepository = exampleRepository;
+        this.validationServiceMap = validationServiceMap;
+    }
 
     @Override
     public List<Example> getAllExamples() {
@@ -37,7 +48,8 @@ public class ExampleServiceImpl implements ExampleService {
     @Override
     public ExampleDTO createExample(Example example) throws InvalidExampleException, CustomDataAccessException {
         try {
-            ExampleServiceImplUtils.validExampleProvided(example);
+            ExampleValidationService createValidationService = validationServiceMap.get("createExampleValidationService");
+            createValidationService.validateExample(example);
             Example savedExample = exampleRepository.save(example);
             return ExampleServiceImplUtils.convertEntityToDTO(savedExample);
         } catch (InvalidExampleException e) {
@@ -52,6 +64,8 @@ public class ExampleServiceImpl implements ExampleService {
     public int updateExample(Long id, Example example) throws ExampleNotFoundException {
         try {
             // validate Example, convert to DTO, or validate in Repository
+            ExampleValidationService updateValidationService = validationServiceMap.get("updateExampleValidationService");
+            updateValidationService.validateExample(example);
             int updatedCount = exampleRepository.update(id, example);
             if (updatedCount == 0) {
                 throw new ExampleNotFoundException(id);

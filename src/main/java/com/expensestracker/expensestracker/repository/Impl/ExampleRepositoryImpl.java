@@ -60,7 +60,7 @@ public class ExampleRepositoryImpl implements ExampleRepository {
 
     @Override
     public Optional<Example> findById(Long id) {
-        return Optional.ofNullable(jdbcTemplate.queryForObject(SELECT_EXAMPLE_BY_ID, new Object[]{id}, rowMapper));
+        return jdbcTemplate.query(SELECT_EXAMPLE_BY_ID, new Object[]{id}, rowMapper).stream().findFirst();
     }
 
     @Override

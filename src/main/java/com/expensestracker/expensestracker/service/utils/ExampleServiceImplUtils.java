@@ -1,6 +1,6 @@
-package com.expensestracker.expensestracker.service.Impl;
+package com.expensestracker.expensestracker.service.utils;
 
-import com.expensestracker.expensestracker.exception.InvalidExampleException;
+import com.expensestracker.expensestracker.dto.ExampleDTO;
 import com.expensestracker.expensestracker.model.Example;
 
 public class ExampleServiceImplUtils {
@@ -20,11 +20,5 @@ public class ExampleServiceImplUtils {
         example.setGenre(exampleDTO.getGenre());
         example.setPrice(exampleDTO.getPrice());
         return example;
-    }
-
-    public static void validExampleProvided(Example example) throws InvalidExampleException {
-        if (example.getName().length() < 3 || example.getName().length() > 60 ){
-            throw new InvalidExampleException("Name must be between 3 and 60 characters long");
-        }
     }
 }

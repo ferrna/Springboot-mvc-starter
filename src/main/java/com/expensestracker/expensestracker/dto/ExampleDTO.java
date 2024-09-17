@@ -1,4 +1,4 @@
-package com.expensestracker.expensestracker.service.Impl;
+package com.expensestracker.expensestracker.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,7 +1,7 @@
 package com.expensestracker.expensestracker.service;
 
 import com.expensestracker.expensestracker.model.Example;
-import com.expensestracker.expensestracker.service.Impl.ExampleDTO;
+import com.expensestracker.expensestracker.dto.ExampleDTO;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;

@@ -1,31 +1,30 @@
-package com.expensestracker.expensestracker.controller.v1;
+package com.expensestracker.expensestracker.dto;
 
 import com.expensestracker.expensestracker.model.Example;
-import com.expensestracker.expensestracker.service.Impl.ExampleDTO;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ResponseWrapper {
+public class ExampleResponseWrapper {
     private Example example;
     private List<Example> examples;
     private String message;
     private ExampleDTO exampleData;
 
-    public ResponseWrapper(Example example) {
+    public ExampleResponseWrapper(Example example) {
         this.example = example;
     }
 
-    public ResponseWrapper(List<Example> examples) {
+    public ExampleResponseWrapper(List<Example> examples) {
         this.examples = examples;
     }
 
-    public ResponseWrapper(String message) {
+    public ExampleResponseWrapper(String message) {
         this.message = message;
     }
 
-    public ResponseWrapper(ExampleDTO exampleData) {
+    public ExampleResponseWrapper(ExampleDTO exampleData) {
         this.exampleData = exampleData;
     }
 
