@@ -2,6 +2,7 @@ package com.expensestracker.expensestracker.repository.Impl;
 
 import com.expensestracker.expensestracker.model.Example;
 import com.expensestracker.expensestracker.repository.ExampleRepository;
+import com.expensestracker.expensestracker.repository.utils.ExampleRepositoryImplUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -9,7 +10,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -25,6 +25,7 @@ public class ExampleRepositoryImpl implements ExampleRepository {
     private final static String DELETE_EXAMPLE_BY_ID = "DELETE FROM examples WHERE id = ?";
     private final static String CREATE_TABLE_EXAMPLES = "CREATE TABLE IF NOT EXISTS examples(id INT PRIMARY KEY,\n" +
             "   name VARCHAR(255), genre VARCHAR(255), price DOUBLE PRECISION);";
+    private final static String CREATE_INDEX_PRICE = "CREATE INDEX IF NOT EXISTS idx_price ON examples(price);";
 
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -34,6 +35,7 @@ public class ExampleRepositoryImpl implements ExampleRepository {
         // Overrides afterPropertiesSet
         // Lógica de inicialización personalizada
         //jdbcTemplate.execute(CREATE_TABLE_EXAMPLES);
+        //jdbcTemplate.execute(CREATE_INDEX_PRICE);
     }
 
 //    @PostConstruct
@@ -67,13 +69,8 @@ public class ExampleRepositoryImpl implements ExampleRepository {
     public Example save(Example example) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate
-                .update(connection -> {
-                    PreparedStatement ps = connection.prepareStatement(INSERT_NEW_EXAMPLE, new String[]{"id"});
-                    ps.setString(1, example.getName());
-                    ps.setString(2, example.getGenre());
-                    ps.setDouble(3, example.getPrice());
-                    return ps;
-                }, keyHolder);
+                .update(connection -> ExampleRepositoryImplUtils
+                        .buildPreparedStatementInsert(connection, INSERT_NEW_EXAMPLE, example), keyHolder);
         example.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
         return example;
     }

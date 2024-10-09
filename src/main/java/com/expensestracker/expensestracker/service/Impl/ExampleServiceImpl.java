@@ -52,11 +52,8 @@ public class ExampleServiceImpl implements ExampleService {
             createValidationService.validateExample(example);
             Example savedExample = exampleRepository.save(example);
             return ExampleServiceImplUtils.convertEntityToDTO(savedExample);
-        } catch (InvalidExampleException e) {
-            throw new InvalidExampleException("Invalid Example provided: " + e.getMessage());
         } catch (DataAccessException e) {
-            // jdbcTemplate.update() exception
-            throw new CustomDataAccessException("Could not create register in database");
+            throw new CustomDataAccessException("Could not create register in database.");
         }
     }
 
@@ -71,9 +68,8 @@ public class ExampleServiceImpl implements ExampleService {
                 throw new ExampleNotFoundException(id);
             }
             return updatedCount;
-
         } catch (DataAccessException e) {
-            throw new ExampleNotFoundException(id);
+            throw new CustomDataAccessException("Could not update the example. Please try again later.");
         }
     }
 
@@ -85,10 +81,7 @@ public class ExampleServiceImpl implements ExampleService {
                 throw new ExampleNotFoundException(id);
             }
         } catch (DataAccessException e) {
-            // Handle specific exception or rethrow as a custom exception
-            throw new CustomDataAccessException(
-                    "Could not delete register from database, "
-                            + e.getMessage() + ", id: " + id);
+            throw new CustomDataAccessException("Could not delete the example. Please try again later.");
         }
     }
 

@@ -1,7 +1,11 @@
-package com.expensestracker.expensestracker.repository.Impl;
+package com.expensestracker.expensestracker.repository.utils;
 
 import com.expensestracker.expensestracker.model.Example;
+import com.expensestracker.expensestracker.repository.Impl.QueryResult;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -58,5 +62,13 @@ public class ExampleRepositoryImplUtils {
 
         // Step 3: Return the stringBuilder and params
         return new QueryResult(query.toString(), params);
+    }
+
+    public static PreparedStatement buildPreparedStatementInsert(Connection connection, String baseQuery, Example example) throws SQLException {
+        PreparedStatement ps = connection.prepareStatement(baseQuery, new String[]{"id"});
+        ps.setString(1, example.getName());
+        ps.setString(2, example.getGenre());
+        ps.setDouble(3, example.getPrice());
+        return ps;
     }
 }
